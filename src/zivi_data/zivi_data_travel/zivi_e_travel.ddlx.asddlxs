@@ -1,0 +1,132 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Travel',
+    typeNamePlural: 'Travels',
+    title: { type: #STANDARD, value: 'TravelID' }
+  }
+}
+
+annotate view ZIVI_C_TRAVEL with
+{
+  /* FACETS (Layout Structure) */
+  @UI.facet: [ 
+    /* Header Data Point */
+    {
+      id: 'StatusHeader',
+      purpose: #HEADER,
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'StatusData',
+      position: 10
+    },
+    {
+      id: 'PriceHeader',
+      purpose: #HEADER,
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'PriceData',
+      position: 20
+    },
+    /* Body Section */
+    {
+      id: 'GeneralInfo',
+      type: #COLLECTION,
+      label: 'General Information',
+      position: 10
+    },
+    {
+      id: 'TravelGroup',
+      parentId: 'GeneralInfo',
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Travel Data',
+      targetQualifier: 'TravelGroup',
+      position: 10
+    },
+    {
+      id: 'DateGroup',
+      parentId: 'GeneralInfo',
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Date Details',
+      targetQualifier: 'DateGroup',
+      position: 20
+    },
+    {
+      id: 'BookingTab',
+      purpose: #STANDARD,
+      type: #LINEITEM_REFERENCE,
+      label: 'Bookings',
+      position: 20,
+      targetElement: '_Booking' 
+    } 
+  ]
+
+  /* FIELDS */
+
+  @UI.hidden: true
+  TravelUUID;
+
+  @UI: {
+    lineItem:       [ { position: 10, importance: #HIGH } ],
+    selectionField: [ { position: 10 } ],
+    fieldGroup:     [ { position: 10, qualifier: 'TravelGroup' } ] 
+  }
+  TravelID;
+
+  @UI: {
+    lineItem:       [ { position: 20, importance: #HIGH } ],
+    selectionField: [ { position: 20 } ],
+    fieldGroup:     [ { position: 20, qualifier: 'TravelGroup' } ]
+  }
+  AgencyID;
+
+  @UI: {
+    lineItem:       [ { position: 30, importance: #HIGH } ],
+    selectionField: [ { position: 30 } ],
+    fieldGroup:     [ { position: 30, qualifier: 'TravelGroup' } ]
+  }
+  CustomerID;
+
+  @UI: {
+    lineItem:       [ { position: 80, importance: #HIGH, label: 'Status' } ],
+    selectionField: [ { position: 40 } ],
+    dataPoint:        { qualifier: 'StatusData', title: 'Status', criticality: 'OverallStatus' },
+    fieldGroup:     [ { position: 40, qualifier: 'TravelGroup', label: 'Status' } ],
+    identification: [ 
+      { position: 80, label: 'Status' },
+      { type: #FOR_ACTION, dataAction: 'acceptTravel', label: 'Accept Travel', position: 90 },
+      { type: #FOR_ACTION, dataAction: 'rejectTravel', label: 'Reject Travel', position: 100 } 
+    ]
+  }
+  OverallStatus;
+
+  @UI: {
+    lineItem:       [ { position: 40, importance: #MEDIUM } ],
+    fieldGroup:     [ { position: 10, qualifier: 'DateGroup' } ]
+  }
+  BeginDate;
+
+  @UI: {
+    lineItem:       [ { position: 50, importance: #MEDIUM } ],
+    fieldGroup:     [ { position: 20, qualifier: 'DateGroup' } ]
+  }
+  EndDate;
+
+  @UI: {
+    lineItem:       [ { position: 60, importance: #MEDIUM } ],
+    dataPoint:        { qualifier: 'PriceData', title: 'Total Price' },
+    fieldGroup:     [ { position: 30, qualifier: 'DateGroup' } ]
+  }
+  TotalPrice;
+
+  @UI: {
+    fieldGroup:     [ { position: 50, qualifier: 'TravelGroup' } ]
+  }
+  Description;
+
+  /* Hidden Admin Fields */
+  @UI.hidden: true
+  lastchangedat;
+
+  @UI.hidden: true
+  LocalLastChangedAt;
+
+}

@@ -1,0 +1,6 @@
+@EndUserText.label: 'Service Definition for Travel App'
+define service ZIVI_UI_TRAVEL {
+  expose ZIVI_C_TRAVEL   as Travel;
+  expose ZIVI_C_BOOKING  as Booking;
+  expose ZIVI_I_CUSTOMER as Customer;
+}
