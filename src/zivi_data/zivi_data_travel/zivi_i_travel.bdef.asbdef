@@ -24,6 +24,7 @@ authorization master ( instance )
 
   // Determinations
   determination calculateTotalPrice on modify { field BookingFee, CurrencyCode; }
+  determination setTravelID on save { create; }
 
   draft action Edit;
   draft action Activate;

@@ -16,6 +16,7 @@ CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING keys REQUEST requested_features FOR Travel RESULT result.
 
     METHODS calculateTotalPrice FOR DETERMINE ON MODIFY IMPORTING keys FOR Travel~calculateTotalPrice.
+    METHODS setTravelID FOR DETERMINE ON SAVE IMPORTING keys FOR Travel~setTravelID.
 
     " Calculate totals for a list of Travel UUIDs
     METHODS recompute_total_price IMPORTING it_travel_uuids TYPE tt_uuid.
@@ -195,6 +196,47 @@ CLASS lhc_Travel IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+  METHOD setTravelID.
+
+    READ ENTITIES OF zivi_i_travel IN LOCAL MODE
+      ENTITY Travel
+        FIELDS ( TravelID ) WITH CORRESPONDING #( keys )
+      RESULT DATA(travels).
+
+    DELETE travels WHERE TravelID IS NOT INITIAL.
+    CHECK travels IS NOT INITIAL.
+
+    LOOP AT travels INTO DATA(travel).
+
+      DATA lv_generated_number TYPE n LENGTH 20.
+
+      TRY.
+          cl_numberrange_runtime=>number_get(
+            EXPORTING
+              nr_range_nr = '01'
+              object      = 'ZIVI_TRAV'
+              quantity    = 1
+            IMPORTING
+              number      = lv_generated_number ).
+
+          DATA(lv_final_id) = lv_generated_number+14(6).
+
+          MODIFY ENTITIES OF zivi_i_travel IN LOCAL MODE
+            ENTITY Travel
+              UPDATE
+                FROM VALUE #( ( %tky      = travel-%tky
+                                TravelID  = lv_final_id
+                                %control-TravelID = if_abap_behv=>mk-on ) ).
+
+        CATCH cx_number_ranges INTO DATA(lx_number_ranges).
+          CONTINUE.
+
+      ENDTRY.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
 ENDCLASS.
 
 CLASS lhc_Booking DEFINITION INHERITING FROM cl_abap_behavior_handler.
@@ -217,7 +259,7 @@ CLASS lhc_Booking IMPLEMENTATION.
 
     " 2. Get unique Parent IDs (to read Travel dates efficiently)
     DATA lt_parent_ids TYPE TABLE OF zivi_i_travel.
-    lt_parent_ids = CORRESPONDING #( lt_bookings DISCARDING DUPLICATES MAPPING TravelUUID = ParentUUID ).
+    lt_parent_ids = CORRESPONDING #( lt_bookings MAPPING TravelUUID = ParentUUID ).
 
     " 3. Read the Parent Travel Data (BeginDate, EndDate)
     READ ENTITIES OF zivi_i_travel IN LOCAL MODE
@@ -251,7 +293,7 @@ CLASS lhc_Booking IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-METHOD calculateTotalPrice.
+  METHOD calculateTotalPrice.
     " 1. Read the Parent UUIDs for the modified bookings
     READ ENTITIES OF zivi_i_travel IN LOCAL MODE
       ENTITY Booking
@@ -266,24 +308,24 @@ METHOD calculateTotalPrice.
     DELETE ADJACENT DUPLICATES FROM lt_parent_uuids.
 
     IF lt_parent_uuids IS NOT INITIAL.
-       " Read Travel & Bookings for these parents
-       READ ENTITIES OF zivi_i_travel IN LOCAL MODE
-         ENTITY Travel FIELDS ( BookingFee ) WITH VALUE #( FOR uuid IN lt_parent_uuids ( traveluuid = uuid ) )
-         RESULT DATA(lt_travels)
-         ENTITY Travel BY \_Booking FIELDS ( FlightPrice ) WITH VALUE #( FOR uuid IN lt_parent_uuids ( traveluuid = uuid ) )
-         RESULT DATA(lt_all_bookings).
+      " Read Travel & Bookings for these parents
+      READ ENTITIES OF zivi_i_travel IN LOCAL MODE
+        ENTITY Travel FIELDS ( BookingFee ) WITH VALUE #( FOR uuid IN lt_parent_uuids ( traveluuid = uuid ) )
+        RESULT DATA(lt_travels)
+        ENTITY Travel BY \_Booking FIELDS ( FlightPrice ) WITH VALUE #( FOR uuid IN lt_parent_uuids ( traveluuid = uuid ) )
+        RESULT DATA(lt_all_bookings).
 
-       " Calculate and Update
-       LOOP AT lt_travels ASSIGNING FIELD-SYMBOL(<ls_travel>).
-         DATA(lv_total) = <ls_travel>-BookingFee.
-         LOOP AT lt_all_bookings INTO DATA(ls_booking) WHERE ParentUUID = <ls_travel>-TravelUUID.
-           lv_total += ls_booking-FlightPrice.
-         ENDLOOP.
+      " Calculate and Update
+      LOOP AT lt_travels ASSIGNING FIELD-SYMBOL(<ls_travel>).
+        DATA(lv_total) = <ls_travel>-BookingFee.
+        LOOP AT lt_all_bookings INTO DATA(ls_booking) WHERE ParentUUID = <ls_travel>-TravelUUID.
+          lv_total += ls_booking-FlightPrice.
+        ENDLOOP.
 
-         MODIFY ENTITIES OF zivi_i_travel IN LOCAL MODE
-           ENTITY Travel UPDATE FIELDS ( TotalPrice )
-           WITH VALUE #( ( %tky = <ls_travel>-%tky TotalPrice = lv_total ) ).
-       ENDLOOP.
+        MODIFY ENTITIES OF zivi_i_travel IN LOCAL MODE
+          ENTITY Travel UPDATE FIELDS ( TotalPrice )
+          WITH VALUE #( ( %tky = <ls_travel>-%tky TotalPrice = lv_total ) ).
+      ENDLOOP.
     ENDIF.
   ENDMETHOD.
 

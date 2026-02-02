@@ -66,8 +66,7 @@ annotate view ZIVI_C_TRAVEL with
 
   @UI: {
     lineItem:       [ { position: 10, importance: #HIGH } ],
-    selectionField: [ { position: 10 } ],
-    fieldGroup:     [ { position: 10, qualifier: 'TravelGroup' } ] 
+    selectionField: [ { position: 10 } ]
   }
   TravelID;
 
