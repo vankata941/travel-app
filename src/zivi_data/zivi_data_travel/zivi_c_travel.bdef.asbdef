@@ -13,6 +13,7 @@ define behavior for ZIVI_C_TRAVEL alias Travel
 
   use association _Booking { create; with draft; }
 
+  field ( readonly ) CurrencyCode, OverallStatus, TotalPrice;
 
   use action Edit;
   use action Activate;

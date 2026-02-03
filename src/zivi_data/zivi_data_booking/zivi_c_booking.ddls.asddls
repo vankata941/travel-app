@@ -16,6 +16,8 @@ define view entity ZIVI_C_BOOKING
       ConnectionID,
       FlightDate,
       FlightPrice,
+      
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZIVI_I_CURRENCY', element: 'CurrencyCode' } }]
       CurrencyCode,
       
       LocalLastChangedAt,

@@ -9,50 +9,68 @@
 
 annotate view ZIVI_C_BOOKING with
 {
-  @UI.facet: [ {
-    id: 'Booking',
-    purpose: #STANDARD,
-    type: #IDENTIFICATION_REFERENCE,
-    label: 'Booking',
-    position: 10
-  } ]
+  /* FACETS */
+  @UI.facet: [
+    {
+      id: 'BookingInfo',
+      type: #COLLECTION,
+      label: 'Booking Details',
+      position: 10
+    },
+    {
+      id: 'FlightData',
+      parentId: 'BookingInfo',
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Flight Information',
+      targetQualifier: 'FlightGroup',
+      position: 10
+    },
+    {
+      id: 'PriceData',
+      parentId: 'BookingInfo',
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Price Details',
+      targetQualifier: 'PriceGroup',
+      position: 20
+    }
+  ]
+
+  /* FIELDS */
 
   @UI: {
-    lineItem:       [ { position: 10, importance: #HIGH } ],
-    identification: [ { position: 10 } ]
+    lineItem:       [ { position: 10 } ],
+    fieldGroup:     [ { position: 10, qualifier: 'FlightGroup' } ]
   }
   BookingID;
 
   @UI: {
-    lineItem:       [ { position: 20, importance: #HIGH } ],
-    identification: [ { position: 20 } ]
+    lineItem:       [ { position: 20 } ],
+    fieldGroup:     [ { position: 50, qualifier: 'FlightGroup' } ]
   }
   BookingDate;
 
   @UI: {
-    lineItem:       [ { position: 30, importance: #HIGH } ],
-    identification: [ { position: 30 } ]
+    lineItem:       [ { position: 30 } ],
+    fieldGroup:     [ { position: 20, qualifier: 'FlightGroup', label: 'Airline ID' } ]
   }
   CarrierID;
 
   @UI: {
-    lineItem:       [ { position: 40, importance: #HIGH } ],
-    identification: [ { position: 40 } ]
+    lineItem:       [ { position: 40 } ],
+    fieldGroup:     [ { position: 40, qualifier: 'FlightGroup', label: 'Flight Number' } ]
   }
   ConnectionID;
 
   @UI: {
-    lineItem:       [ { position: 50, importance: #HIGH } ],
-    identification: [ { position: 50 } ]
+    lineItem:       [ { position: 50 } ],
+    fieldGroup:     [ { position: 60, qualifier: 'FlightGroup' } ]
   }
   FlightDate;
 
   @UI: {
-    lineItem:       [ { position: 60, importance: #HIGH } ],
-    identification: [ { position: 60 } ]
+    lineItem:       [ { position: 60 } ],
+    fieldGroup:     [ { position: 10, qualifier: 'PriceGroup' } ]
   }
   FlightPrice;
-
-  @UI.hidden: true
-  LocalLastChangedAt;
+  
 }

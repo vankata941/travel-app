@@ -14,6 +14,10 @@ authorization master ( instance )
   update;
   delete;
 
+  side effects {
+    entity _Booking affects field TotalPrice;
+  }
+
   // Validations
   validation validateDates on save { field BeginDate, EndDate; create; update; }
   validation validateCustomer on save { field CustomerID; create; update; }
@@ -24,7 +28,9 @@ authorization master ( instance )
 
   // Determinations
   determination calculateTotalPrice on modify { field BookingFee, CurrencyCode; }
-  determination setTravelID on save { create; }
+  determination setTravelID on modify { create; }
+  determination setInitialStatus on modify { create; }
+  determination setInitialCurrency on modify { create; }
 
   draft action Edit;
   draft action Activate;
@@ -36,8 +42,8 @@ authorization master ( instance )
 
 
   field ( numbering : managed, readonly ) TravelUUID;
-  field ( readonly ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChangedAt;
-
+  field ( readonly ) TravelID, OverallStatus, StatusText, TotalPrice,
+   CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChangedAt;
 
   mapping for zivi_d_travel_a
   {
@@ -74,12 +80,13 @@ authorization dependent by _Travel
   validation validateFlightDate on save { field FlightDate; create; update; }
 
   // Determinations
-  determination calculateTotalPrice on modify { field FlightPrice, CurrencyCode; }
+  determination calculateTotalPrice_Book on modify { create; delete; field FlightPrice, CurrencyCode; }
+  determination setBookingID on modify { create; }
 
   association _Travel { with draft; }
 
   field ( numbering : managed, readonly ) BookingUUID;
-  field ( readonly ) ParentUUID, LocalLastChangedAt;
+  field ( readonly ) BookingID, ParentUUID, LocalLastChangedAt;
 
   mapping for zivi_d_booking_a
   {
