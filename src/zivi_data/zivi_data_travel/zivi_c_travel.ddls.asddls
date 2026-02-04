@@ -10,16 +10,14 @@ define root view entity ZIVI_C_TRAVEL
   key     TravelUUID,
 
           @Search.defaultSearchElement: true
+          @Search.fuzzinessThreshold: 0.7
           TravelID,
 
-          @Search.defaultSearchElement: true
           AgencyID,
 
-          @Search.defaultSearchElement: true
           @Consumption.valueHelpDefinition: [{ entity: { name: 'ZIVI_I_CUSTOMER', element: 'CustomerID' } }]
           CustomerID,
           
-
           BeginDate,
           EndDate,
           BookingFee,

@@ -134,7 +134,6 @@ annotate view ZIVI_C_TRAVEL with
   /* --- PRICE DETAILS (COLUMN 3) --- */
 
   @UI: {
-    lineItem:       [ { position: 60, importance: #MEDIUM } ],
     fieldGroup:     [ { position: 10, qualifier: 'PriceGroup', label: 'Booking Fee' } ]
   }
   BookingFee;

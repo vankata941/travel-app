@@ -1,5 +1,7 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Travel Interface View'
+@Search.searchable: true
+
 define root view entity ZIVI_I_TRAVEL
   as select from zivi_d_travel_a as Travel
 
@@ -9,7 +11,10 @@ define root view entity ZIVI_I_TRAVEL
 
 {
   key travel_uuid            as TravelUUID,
+
+      @Search.defaultSearchElement: true
       travel_id              as TravelID,
+
       agency_id              as AgencyID,
       customer_id            as CustomerID,
       begin_date             as BeginDate,
